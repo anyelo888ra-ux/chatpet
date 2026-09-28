@@ -6,8 +6,9 @@ export default function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   res.status(200).json({
     status: "online",
-    version: "0.5",
-    brain: "cloud",
-    modelConfigured: Boolean(process.env.MODEL_URL)
+    version: "0.6",
+    brain: "cloud+",
+    modelConfigured: Boolean(process.env.MODEL_URL),
+    authConfigured: Boolean(process.env.MODEL_API_KEY)
   });
 }
