@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       return json(res, 200, {
         reply: "☁️ Cloud Brain+ está conectado, pero no hay un MODEL_URL configurado. Añade tu endpoint self-hosted en Vercel.",
         brain: "cloud+",
-        version: "0.6",
+        version: "0.7",
         modelConfigured: false
       });
     }
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
     return json(res, 200, {
       reply: reply.trim(),
       brain: "cloud+",
-      version: "0.6",
+      version: "0.7",
       model: modelName,
       latencyMs: Date.now() - started
     });
