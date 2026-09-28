@@ -1,5 +1,5 @@
 const ChatPet = (() => {
-  const KEY = "chatpet:v0.2:conversation";
+  const KEY = "chatpet:v0.3:conversation";
   const MAX = 20;
   const WINDOW = 60000;
   const state = { messages: [], timestamps: [] };
