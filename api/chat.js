@@ -13,6 +13,17 @@ function json(res, status, body) {
   res.status(status).setHeader("Cache-Control", "no-store").json(body);
 }
 
+function extractReply(data) {
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content.map(part => typeof part === "string" ? part : part?.text || "").join("").trim();
+  }
+  if (typeof data?.reply === "string") return data.reply;
+  if (typeof data?.response === "string") return data.response;
+  return "";
+}
+
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,22 +41,33 @@ export default async function handler(req, res) {
 
     const modelUrl = process.env.MODEL_URL || "";
     const modelName = process.env.MODEL_NAME || "local-model";
+    const apiKey = process.env.MODEL_API_KEY || "";
+    const authHeader = process.env.MODEL_AUTH_HEADER || "Authorization";
+    const authPrefix = process.env.MODEL_AUTH_PREFIX ?? "Bearer ";
 
     if (!modelUrl) {
       return json(res, 200, {
-        reply: "☁️ Cloud Brain está conectado, pero no hay un MODEL_URL configurado. Añade un endpoint de modelo self-hosted en Vercel para generar respuestas reales.",
-        brain: "cloud",
-        version: "0.5"
+        reply: "☁️ Cloud Brain+ está conectado, pero no hay un MODEL_URL configurado. Añade tu endpoint self-hosted en Vercel.",
+        brain: "cloud+",
+        version: "0.6",
+        modelConfigured: false
       });
     }
 
+    const headers = { "Content-Type": "application/json" };
+    if (apiKey) headers[authHeader] = authPrefix + apiKey;
+
+    const started = Date.now();
     const response = await fetch(modelUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({
         model: modelName,
         messages: [
-          { role: "system", content: "You are ChatPet Cloud Brain. Be helpful, concise, and safe. Do not claim to be a human." },
+          {
+            role: "system",
+            content: "You are ChatPet Cloud Brain+. Be helpful, concise, safe, and honest. Do not claim to be a human. Use the conversation context when relevant."
+          },
           ...cleanHistory(req.body?.history),
           { role: "user", content: message }
         ],
@@ -55,12 +77,19 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) throw new Error("Model HTTP " + response.status);
-    const data = await response.json();
-    const reply = data?.choices?.[0]?.message?.content ?? data?.reply ?? data?.response;
-    if (typeof reply !== "string" || !reply.trim()) throw new Error("Unsupported model response format");
 
-    return json(res, 200, { reply: reply.trim(), brain: "cloud", version: "0.5" });
+    const data = await response.json();
+    const reply = extractReply(data);
+    if (!reply.trim()) throw new Error("Unsupported model response format");
+
+    return json(res, 200, {
+      reply: reply.trim(),
+      brain: "cloud+",
+      version: "0.6",
+      model: modelName,
+      latencyMs: Date.now() - started
+    });
   } catch {
-    return json(res, 500, { error: "Cloud Brain request failed" });
+    return json(res, 502, { error: "Cloud Brain+ request failed" });
   }
 }
