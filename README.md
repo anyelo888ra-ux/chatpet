@@ -2,28 +2,38 @@
 
 ChatPet is an open-source experiment to build a transparent, community-driven AI chat platform.
 
-## v0.1
+## v0.2 — Local Brain
 
-The first version runs entirely in the browser. It does not require a commercial AI API key or send messages to an external AI provider.
+ChatPet v0.2 moves the conversation engine into a dedicated local brain module.
 
-The current brain is intentionally small. It demonstrates conversation state, local memory, commands, rate limiting, and a replaceable inference layer.
+- Runs entirely in the browser.
+- No commercial AI API key is required.
+- No external AI provider receives the chat.
+- Conversation memory remains in browser localStorage.
+- The UI and brain are now separated.
+- The current Local Brain is lightweight and rule/context based; it is **not yet a large language model**.
+- The architecture is prepared for a stronger local/open model later.
 
 ## Structure
 
 - GitHub Pages: public web interface.
-- Browser app: HTML/CSS/JavaScript.
-- Local storage: optional local conversation history.
-- Brain layer: replaceable future model interface.
-- Limits: local demo fair-use limits.
+- app.js: chat UI, local memory, and local fair-use demo limit.
+- brain/local.js: v0.2 Local Brain.
+- Local storage: recent conversation history.
+- Future brain adapter: replaceable inference layer.
 
 ## Roadmap
 
-1. Improve the browser brain.
-2. Add a real local/open-model adapter.
-3. Add a server-side inference option.
-4. Add privacy controls and configurable memory.
-5. Add tests and contribution tooling.
-6. Support multiple open model backends without requiring a proprietary API.
+1. ~~Browser demo brain~~
+2. **v0.2: Local Brain**
+3. v0.3: stronger local/context engine
+4. v0.4: advanced brain preparation
+5. v0.5: Cloud Brain
+6. v0.6: Cloud Brain+
+7. v0.7: Multi-Brain
+8. v0.8: Advanced Cloud
+9. v0.9: Pre-1.0
+10. v1.0: ChatPet AI
 
 Planned domain: chatpet.duckdns.org
 
