@@ -40,13 +40,17 @@ Planned domain: chatpet.duckdns.org
 See docs/ARCHITECTURE.md and docs/CONTRIBUTING.md.
 
 
-## v0.3 — Local Brain+
+## v0.4 — Local Brain+ Expansion
 
-v0.3 adds:
-- SVG banner, icon, and favicon in `assets/`
-- improved local intent matching
-- better recent-conversation similarity
-- browser-only context processing
-- no commercial AI API key required
+v0.4 expands the browser brain and developer experience:
+- SVG banner, icon, and favicon
+- intent detection and token similarity
+- recent-context matching across more messages
+- memory toggle and safe local clearing
+- JSON conversation export/import
+- developer commands: `/help`, `/status`, `/memory`, `/clear`, `/export`, `/about`
+- diagnostics panel
+- typing state and larger input limit
+- versioned cache-busting for v0.4
 
-The current brain is still a lightweight rule/context engine, not a full large language model.
+The current brain remains a lightweight rule/context engine, not a full language model.
