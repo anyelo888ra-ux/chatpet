@@ -1,8 +1,8 @@
 const ChatPet = (() => {
-  const KEY = "chatpet:v0.6:conversation";
-  const SETTINGS = "chatpet:v0.6:settings";
+  const KEY = "chatpet:v0.7:conversation";
+  const SETTINGS = "chatpet:v0.7:settings";
   const MAX = 20, WINDOW = 60000;
-  const state = { messages: [], timestamps: [], memory: true, theme: 0, brain: "local", cloudOnline: false, modelConfigured: false };
+  const state = { messages: [], timestamps: [], memory: true, theme: 0, brain: "local", cloudOnline: false, modelConfigured: false, lastUsedBrain: "local" };
   const $ = selector => document.querySelector(selector);
 
   function escapeHtml(value) { return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
@@ -11,7 +11,7 @@ const ChatPet = (() => {
       const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
       if (Array.isArray(saved)) state.messages = saved.slice(-50);
       const settings = JSON.parse(localStorage.getItem(SETTINGS) || "{}");
-      if (settings.brain === "cloud" || settings.brain === "local") state.brain = settings.brain;
+      if (["local", "cloud", "auto"].includes(settings.brain)) state.brain = settings.brain;
       if (settings.theme) state.theme = 1;
     } catch { state.messages = []; }
     document.body.classList.toggle("light", state.theme === 1);
@@ -21,26 +21,26 @@ const ChatPet = (() => {
   function add(role, content) { state.messages.push({role,content,time:Date.now()}); state.messages=state.messages.slice(-50); save(); render(); }
   function render() {
     const box=$("#messages"); if(!box)return;
-    if(!state.messages.length) box.innerHTML='<div class="message system">🐾 ChatPet v0.6 está listo. Escribe /help para ver los comandos.</div>';
+    if(!state.messages.length) box.innerHTML='<div class="message system">🐾 ChatPet v0.7 está listo. Escribe /help para ver los comandos.</div>';
     else box.innerHTML=state.messages.map(m=>'<div class="message '+(m.role==="user"?"user":"bot")+'">'+escapeHtml(m.content)+'</div>').join("");
     $("#messageCount").textContent=state.messages.length; box.scrollTop=box.scrollHeight;
     $("#memoryState").textContent=state.memory?"LOCAL":"OFF";
-    $("#brainState").textContent=state.brain==="cloud"?"CLOUD+":"LOCAL v0.6";
-    $("#brainStatus").textContent=state.brain==="cloud"?(state.cloudOnline?"CLOUD BRAIN+":"CLOUD OFFLINE"):"LOCAL BRAIN+";
+    $("#brainState").textContent=window.ChatPetBrainRouter ? window.ChatPetBrainRouter.label(state.brain) : state.brain.toUpperCase();
+    $("#brainStatus").textContent=state.brain==="cloud"?(state.cloudOnline?"CLOUD BRAIN+":"CLOUD OFFLINE"):state.brain==="auto"?"AUTO BRAIN":"LOCAL BRAIN+";
     $("#memoryBtn").textContent="Memory: "+(state.memory?"ON":"OFF");
-    $("#brainBtn").textContent="Brain: "+state.brain.toUpperCase();
-    $("#chatSub").textContent=state.brain==="cloud"?"Cloud Brain+ · /api/chat · fallback ready":"Local Brain+ · browser inference · fallback ready";
+    $("#brainBtn").textContent="Brain: "+(window.ChatPetBrainRouter ? window.ChatPetBrainRouter.label(state.brain) : state.brain.toUpperCase());
+    $("#chatSub").textContent=state.brain==="cloud"?"Cloud Brain+ · /api/chat · fallback ready":state.brain==="auto"?"Multi-Brain AUTO · cloud when ready · local fallback":"Local Brain+ · browser inference · fallback ready";
   }
   function allowed(){const now=Date.now();state.timestamps=state.timestamps.filter(t=>now-t<WINDOW);if(state.timestamps.length>=MAX)return false;state.timestamps.push(now);return true;}
   function command(input){
     const cmd=input.toLowerCase().trim();
     if(cmd==="/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about";
-    if(cmd==="/status") return "📊 ChatPet v0.6 | Brain "+state.brain.toUpperCase()+" | Cloud "+(state.cloudOnline?"ONLINE":"OFFLINE")+" | Modelo "+(state.modelConfigured?"CONFIGURADO":"NO CONFIGURADO")+" | Memoria "+(state.memory?"ON":"OFF")+" | "+state.messages.length+" mensajes.";
-    if(cmd==="/brain") { state.brain=state.brain==="local"?"cloud":"local"; saveSettings(); render(); if(state.brain==="cloud")checkCloud(); return "🧠 Brain cambiado a "+state.brain.toUpperCase()+"."; }
+    if(cmd==="/status") return "📊 ChatPet v0.7 | Brain "+state.brain.toUpperCase()+" | Cloud "+(state.cloudOnline?"ONLINE":"OFFLINE")+" | Modelo "+(state.modelConfigured?"CONFIGURADO":"NO CONFIGURADO")+" | Memoria "+(state.memory?"ON":"OFF")+" | "+state.messages.length+" mensajes.";
+    if(cmd==="/brain") { state.brain=window.ChatPetBrainRouter?window.ChatPetBrainRouter.next(state.brain):(state.brain==="local"?"cloud":"local"); saveSettings(); render(); checkCloud(); return "🧠 Brain cambiado a "+(window.ChatPetBrainRouter?window.ChatPetBrainRouter.label(state.brain):state.brain.toUpperCase())+"."; }
     if(cmd==="/memory") { state.memory=!state.memory; if(!state.memory)localStorage.removeItem(KEY); render(); return "💾 Memoria local: "+(state.memory?"ACTIVADA":"DESACTIVADA")+"."; }
     if(cmd==="/clear") { state.messages=[]; localStorage.removeItem(KEY); render(); return "🧹 Conversación y memoria local limpiadas."; }
     if(cmd==="/export") { exportData(); return "📦 Exportación JSON preparada."; }
-    if(cmd==="/about") return "🐾 ChatPet v0.6: Local Brain+ + Cloud Brain+. Credenciales del modelo, si existen, permanecen en el servidor.";
+    if(cmd==="/about") return "🐾 ChatPet v0.7: Local Brain+ + Cloud Brain+. Credenciales del modelo, si existen, permanecen en el servidor.";
     return null;
   }
   function exportData(){
@@ -63,23 +63,19 @@ const ChatPet = (() => {
     if(!allowed()){add("bot","⏳ Límite temporal alcanzado. Espera un poco y vuelve a intentarlo.");return;}
     const previous=state.messages.slice(); add("user",clean); $("#typing").hidden=false;
     try {
-      let response;
-      if(state.brain==="cloud") {
-        try {
-          response=await cloudReply(clean,previous);
-          state.cloudOnline=true;
-        } catch {
-          state.cloudOnline=false;
-          response=window.ChatPetLocalBrain?window.ChatPetLocalBrain.reply(clean,previous):"🐾 Local Brain no cargado.";
-          response="☁️ Cloud Brain+ no respondió. Activé Local Brain+ como fallback.\n\n"+response;
-        }
-      } else {
-        response=window.ChatPetLocalBrain?window.ChatPetLocalBrain.reply(clean,previous):"🐾 Local Brain no cargado.";
-      }
-      add("bot",response);
+      if(!window.ChatPetBrainRouter) throw new Error("Brain Router unavailable");
+      const result=await window.ChatPetBrainRouter.reply(state.brain, clean, previous, state);
+      state.lastUsedBrain=result.used;
+      if(result.cloud) state.cloudOnline=true;
+      add("bot",result.reply);
+    } catch {
+      state.cloudOnline=false;
+      state.lastUsedBrain="local";
+      const response=window.ChatPetLocalBrain?window.ChatPetLocalBrain.reply(clean,previous):"🐾 Local Brain no cargado.";
+      add("bot","☁️ Brain seleccionado no respondió. Activé Local Brain+ como fallback.\n\n"+response);
     } finally { $("#typing").hidden=true; render(); }
   }
-  function diagnostics(){alert("ChatPet v0.6\nBrain: "+state.brain.toUpperCase()+"\nCloud: "+(state.cloudOnline?"ONLINE":"OFFLINE")+"\nModel configured: "+(state.modelConfigured?"YES":"NO")+"\nMessages: "+state.messages.length+"\nMemory: "+(state.memory?"ON":"OFF")+"\nProvider: server-side endpoint");}
+  function diagnostics(){alert("ChatPet v0.7\nBrain: "+state.brain.toUpperCase()+"\nCloud: "+(state.cloudOnline?"ONLINE":"OFFLINE")+"\nModel configured: "+(state.modelConfigured?"YES":"NO")+"\nMessages: "+state.messages.length+"\nMemory: "+(state.memory?"ON":"OFF")+"\nLast used brain: "+state.lastUsedBrain+"\nProvider: server-side endpoint");}
   async function checkCloud(){
     try {
       const response=await fetch("/health",{cache:"no-store"});
@@ -99,7 +95,7 @@ const ChatPet = (() => {
     $("#exportBtn").addEventListener("click",exportData);
     $("#importInput").addEventListener("change",e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value="";});
     $("#memoryBtn").addEventListener("click",()=>{state.memory=!state.memory;if(!state.memory)localStorage.removeItem(KEY);else save();render();});
-    $("#brainBtn").addEventListener("click",()=>{state.brain=state.brain==="local"?"cloud":"local";saveSettings();render();if(state.brain==="cloud")checkCloud();});
+    $("#brainBtn").addEventListener("click",()=>{state.brain=window.ChatPetBrainRouter?window.ChatPetBrainRouter.next(state.brain):(state.brain==="local"?"cloud":"local");saveSettings();render();checkCloud();});
     $("#themeBtn").addEventListener("click",()=>{state.theme=state.theme?0:1;document.body.classList.toggle("light",state.theme===1);saveSettings();});
     $("#diagnosticsBtn").addEventListener("click",diagnostics);
   }
