@@ -1,24 +1,22 @@
 # ChatPet Brain
 
-## v0.2 Local Brain
+## v0.4 Local Brain+
 
-The v0.2 browser app loads brain/local.js as its first dedicated brain module.
+The v0.4 brain adds:
+- intent detection
+- token-based similarity
+- recent context over multiple messages
+- basic question handling
+- replaceable brain API: `reply`, `detectIntent`, and `similarity`
 
-The Local Brain is lightweight and uses:
-- local language rules
-- recent user-message context
-- simple question/context handling
+It remains a lightweight browser engine and does not claim to be a full language model.
 
-It does **not** claim to be a full language model.
+## Future
 
-## Future versions
-
-The brain layer is designed to be replaceable:
-
-v0.2 Local Brain
--> v0.3 stronger local/context engine
--> v0.4 advanced brain preparation
+v0.4 Local Brain+
 -> v0.5 Cloud Brain
+-> v0.6 Cloud Brain+
+-> v0.7 Multi-Brain
 -> v1.0 ChatPet AI
 
-A future implementation can connect an open/local model without exposing private credentials in the GitHub Pages frontend.
+A future implementation can connect an open/local model or self-hosted inference service without exposing private credentials in the static frontend.
