@@ -1,16 +1,16 @@
 window.ChatPetLocalBrain = (() => {
   const rules = [
-    { test: /^(hi|hello|hey|hola|buenas|ey)\\b/i, reply: "¡Hola! 🐾 Soy ChatPet. Mi cerebro local v0.2 está funcionando." },
-    { test: /\\b(version|versión)\\b/i, reply: "Estoy en ChatPet v0.2: Local Brain. La interfaz y el cerebro ya están separados para futuras versiones." },
-    { test: /\\b(api key|apikey)\\b/i, reply: "ChatPet v0.2 no necesita una API key. El cerebro actual funciona localmente en tu navegador." },
-    { test: /\\b(github|repositorio)\\b/i, reply: "ChatPet es open-source. El frontend puede seguir en GitHub Pages mientras el cerebro evoluciona." },
-    { test: /\\b(ayuda|help)\\b/i, reply: "Puedes hablar conmigo, preguntar por mi versión, preguntar qué es el Local Brain o escribir cualquier mensaje para probar el contexto local." },
-    { test: /\\b(local brain|cerebro local)\\b/i, reply: "El Local Brain v0.2 procesa tu mensaje dentro del navegador. No envía la conversación a un proveedor de IA." },
-    { test: /\\b(límite|limite|limits?)\\b/i, reply: "El límite del prototipo sigue siendo local y sirve como fair-use de demostración. En una futura versión cloud, los límites reales deberán estar en el servidor." }
+    { test: /^(hi|hello|hey|hola|buenas|ey)\b/i, reply: "¡Hola! 🐾 Soy ChatPet. Mi cerebro local v0.2 está funcionando." },
+    { test: /\b(version|versión)\b/i, reply: "Estoy en ChatPet v0.2: Local Brain. La interfaz y el cerebro ya están separados para futuras versiones." },
+    { test: /\b(api key|apikey)\b/i, reply: "ChatPet v0.2 no necesita una API key. El cerebro actual funciona localmente en tu navegador." },
+    { test: /\b(github|repositorio)\b/i, reply: "ChatPet es open-source. El frontend puede seguir en GitHub Pages mientras el cerebro evoluciona." },
+    { test: /\b(ayuda|help)\b/i, reply: "Puedes hablar conmigo, preguntar por mi versión, preguntar qué es el Local Brain o escribir cualquier mensaje para probar el contexto local." },
+    { test: /\b(local brain|cerebro local)\b/i, reply: "El Local Brain v0.2 procesa tu mensaje dentro del navegador. No envía la conversación a un proveedor de IA." },
+    { test: /\b(límite|limite|limits?)\b/i, reply: "El límite del prototipo sigue siendo local y sirve como fair-use de demostración. En una futura versión cloud, los límites reales deberán estar en el servidor." }
   ];
 
   function normalize(text) {
-    return text.trim().replace(/\\s+/g, " ");
+    return text.trim().replace(/\s+/g, " ");
   }
 
   function recentContext(messages) {
