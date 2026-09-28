@@ -1,8 +1,8 @@
 # ChatPet Architecture
 
-## v0.5
+## v0.6
 
-Browser -> app.js -> Brain Adapter -> Local Brain+ or Cloud Brain
+Browser -> app.js -> Brain Adapter -> Local Brain+ or Cloud Brain+ -> self-hosted model
 
 ### Local mode
 
@@ -10,49 +10,36 @@ Browser -> brain/local.js -> local response
 
 ### Cloud mode
 
-Browser -> brain/cloud.js -> /api/chat -> server/index.js -> self-hosted model endpoint
+Browser -> brain/cloud.js -> /api/chat -> Vercel Function -> self-hosted model endpoint
 
-v0.5 adds:
-- replaceable Cloud Brain adapter
-- Local / Cloud brain switching
-- Cloud health check at /health
-- automatic Local Brain+ fallback when Cloud Brain fails
-- limited recent context sent to the cloud endpoint
-- self-hosted Node server skeleton
-- no private credentials in the static frontend
+## Cloud Brain+ environment
 
-## Cloud Server
+The Vercel Function reads `MODEL_URL`, optional `MODEL_NAME`, optional `MODEL_API_KEY`, optional `MODEL_AUTH_HEADER`, and optional `MODEL_AUTH_PREFIX`.
 
-The server in server/index.js is designed to sit between the public browser and a separately hosted model/inference service.
+The browser never receives these environment values.
 
-The server accepts:
-- POST /api/chat
-- GET /health
+## Model protocol
 
-The browser never needs a model credential. Model credentials or private inference configuration belong on the server side.
+ChatPet sends an OpenAI-compatible request with `model`, `messages`, `temperature`, and `max_tokens`.
 
-The v0.5 server can be connected to an OpenAI-compatible or other self-hosted inference layer by extending the server's model adapter. The repository does not include a commercial API key.
+Accepted response formats include `choices[0].message.content`, `reply`, and `response`, plus simple content-part arrays containing text.
 
-## Memory
+## Health
 
-Conversation history is stored in browser localStorage only while local memory is enabled.
-
-When Cloud Brain is selected, only the recent context needed for the request is sent to the Cloud Brain endpoint.
-
-## Limits
-
-The client-side 20 messages/minute limit is only a prototype fair-use mechanism. Public cloud limits must be enforced server-side.
-
-The server also limits request size and recent context length.
+`GET /health` reports online status, version, brain type, whether `MODEL_URL` is configured, and whether a model API key is configured. No secret value is returned.
 
 ## Security
 
-GitHub Pages must never contain API keys, service credentials, or private inference credentials.
+Do not put model credentials in frontend JavaScript. Keep `MODEL_API_KEY` in Vercel Environment Variables when authentication is needed. Use HTTPS for public deployments.
 
-For a public deployment, configure CORS to the exact frontend origin instead of leaving the default wildcard.
+## DuckDNS
+
+DuckDNS is only the custom hostname layer:
+
+Browser -> chatpet.duckdns.org -> Vercel -> /api/chat -> model endpoint
+
+The DuckDNS hostname does not host the AI model by itself.
 
 ## Future path
 
-Browser -> brain adapter -> local/open model -> self-hosted inference -> Cloud Brain+
-
-The interface should not need to be rebuilt when the inference backend changes.
+Browser -> brain adapter -> Local Brain+ / Cloud Brain+ -> Multi-Brain -> Advanced Cloud -> ChatPet AI
