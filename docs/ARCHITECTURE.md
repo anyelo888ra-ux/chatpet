@@ -1,12 +1,20 @@
 # ChatPet Architecture
 
-## v0.2
-
-The public web layer and brain layer are now separated:
+## v0.4
 
 Browser -> index.html / style.css / app.js -> brain/local.js -> local response
 
-The v0.2 brain is a lightweight browser engine using local rules and recent conversation context. It is intentionally not presented as a large language model.
+v0.4 expands the local layer with:
+- intent detection
+- token-based similarity
+- recent conversation context
+- local memory toggle
+- JSON import/export
+- developer commands
+- diagnostics
+- typing state
+
+No private credentials are stored in the static frontend.
 
 ## Future path
 
@@ -14,18 +22,14 @@ Browser -> brain adapter -> local/open model -> optional self-hosted inference s
 
 The interface should not need to be rebuilt when the inference backend changes.
 
-## GitHub Pages
-
-GitHub Pages hosts the static frontend. It must not contain private API keys, service credentials, or other secrets.
-
 ## Memory
 
-The prototype stores recent conversation history in browser localStorage. v0.2 uses a new storage key so old v0.1 state does not silently mix with the new version.
+Conversation history is stored in browser localStorage only while local memory is enabled.
 
 ## Limits
 
-Client-side limits are only a demonstration. A real public deployment must enforce abuse/fair-use limits on the server.
+The client-side 20 messages/minute limit is only a prototype fair-use mechanism. Public cloud limits must be enforced server-side.
 
-## Domain
+## Security
 
-chatpet.duckdns.org can later point to a public backend or another deployment.
+GitHub Pages must never contain API keys, service credentials, or private inference credentials.
