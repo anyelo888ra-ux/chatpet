@@ -1,45 +1,35 @@
 # ChatPet Architecture
 
-## v0.6
+## v0.7
 
-Browser -> app.js -> Brain Adapter -> Local Brain+ or Cloud Brain+ -> self-hosted model
+Browser -> app.js -> Brain Router -> Local Brain+ / Cloud Brain+ / AUTO
 
-### Local mode
+### Local
+Browser -> brain/router.js -> brain/local.js
 
-Browser -> brain/local.js -> local response
+### Cloud
+Browser -> brain/router.js -> brain/cloud.js -> /api/chat -> Vercel -> self-hosted model
 
-### Cloud mode
-
-Browser -> brain/cloud.js -> /api/chat -> Vercel Function -> self-hosted model endpoint
-
-## Cloud Brain+ environment
-
-The Vercel Function reads `MODEL_URL`, optional `MODEL_NAME`, optional `MODEL_API_KEY`, optional `MODEL_AUTH_HEADER`, and optional `MODEL_AUTH_PREFIX`.
-
-The browser never receives these environment values.
-
-## Model protocol
-
-ChatPet sends an OpenAI-compatible request with `model`, `messages`, `temperature`, and `max_tokens`.
-
-Accepted response formats include `choices[0].message.content`, `reply`, and `response`, plus simple content-part arrays containing text.
-
-## Health
-
-`GET /health` reports online status, version, brain type, whether `MODEL_URL` is configured, and whether a model API key is configured. No secret value is returned.
+### AUTO
+Browser -> brain/router.js -> /health
+- Cloud online + model configured -> Cloud Brain+
+- Otherwise -> Local Brain+
+- Cloud failure -> Local Brain+ fallback
 
 ## Security
 
-Do not put model credentials in frontend JavaScript. Keep `MODEL_API_KEY` in Vercel Environment Variables when authentication is needed. Use HTTPS for public deployments.
+Model credentials stay in Vercel Environment Variables and never enter frontend JavaScript.
+
+## Health
+
+`GET /health` reports online status, version, multi-brain type, model configuration, and authentication configuration without returning secrets.
 
 ## DuckDNS
 
-DuckDNS is only the custom hostname layer:
+Browser -> www.chatpet.duckdns.org -> Vercel -> /api/chat -> model endpoint
 
-Browser -> chatpet.duckdns.org -> Vercel -> /api/chat -> model endpoint
+DuckDNS is only the public hostname layer.
 
-The DuckDNS hostname does not host the AI model by itself.
+## Future
 
-## Future path
-
-Browser -> brain adapter -> Local Brain+ / Cloud Brain+ -> Multi-Brain -> Advanced Cloud -> ChatPet AI
+Browser -> Brain Router -> Local Brain+ / Cloud Brain+ -> additional brains -> Advanced Cloud -> ChatPet AI
