@@ -1,0 +1,13 @@
+{
+  "name": "chatpet-cloud-brain",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Self-hosted Cloud Brain server for ChatPet",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
