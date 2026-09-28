@@ -14,10 +14,12 @@ window.ChatPetCloudBrain = (() => {
       })
     });
 
-    if (!response.ok) throw new Error("Cloud Brain HTTP " + response.status);
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data?.error || "Cloud Brain+ HTTP " + response.status);
+    }
     if (!data || typeof data.reply !== "string") {
-      throw new Error("Invalid Cloud Brain response");
+      throw new Error("Invalid Cloud Brain+ response");
     }
     return data.reply;
   }
