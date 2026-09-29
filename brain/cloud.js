@@ -1,6 +1,6 @@
 window.ChatPetCloudBrain = (() => {
   const ENDPOINT = "/api/chat";
-  const TIMEOUT_MS = 35000;
+  const TIMEOUT_MS = 60000;
 
   async function reply(input, messages = []) {
     const controller = new AbortController();
