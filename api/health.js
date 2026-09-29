@@ -7,8 +7,8 @@ export default function handler(req, res) {
   const timeoutMs = Math.max(5000, Math.min(60000, Number(process.env.MODEL_TIMEOUT_MS) || 30000));
   res.status(200).json({
     status: "online",
-    version: "0.9.5",
-    brain: "pre-1.0-final-candidate",
+    version: "1.0.0",
+    brain: "chatpet-ai",
     modelConfigured: Boolean(process.env.MODEL_URL),
     authConfigured: Boolean(process.env.MODEL_API_KEY),
     provider: providerName(),
