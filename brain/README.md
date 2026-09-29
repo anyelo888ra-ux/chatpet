@@ -1,6 +1,8 @@
 # ChatPet Brain
 
-## v0.9 — Pre-1.0
+## v1.0.0 — ChatPet AI
+
+The production chat core uses the brain router, context/prompt pipeline, and server-side model provider abstraction. Real model availability depends on deployment configuration.
 
 - brain/local.js — Local Brain+
 - brain/context.js — browser-side context normalization
@@ -33,6 +35,6 @@ Future providers can be added without rewriting the chat UI.
 
 ## Roadmap
 
-v0.9 Pre-1.0 -> v1.0 ChatPet AI
+v1.0.0 ChatPet AI
 
 v1.0 can build on this layer with streaming, evaluations, observability, rate limiting, sessions, and stronger production hardening.
