@@ -1,5 +1,13 @@
 # ChatPet Architecture
 
+## v1.1.0 — Vision + Web Context
+
+Browser -> ChatPet UI -> vision adapter -> /api/chat -> vision-capable model
+
+Browser -> /api/browse -> self-hosted web gateway -> page/question answer
+
+Vision is optional and requires a compatible model. Web access is opt-in through `WEB_TOOL_URL`; ChatPet does not directly expose a generic server-side URL fetcher.
+
 ## v1.0.0 — ChatPet AI
 
 v1.0.0 is the stable application architecture. A real model remains an external dependency and must be configured through Vercel environment variables.
