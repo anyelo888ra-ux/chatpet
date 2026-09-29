@@ -1,30 +1,32 @@
 window.ChatPetCloudBrain = (() => {
   const ENDPOINT = "/api/chat";
-  const TIMEOUT_MS = 25000;
+  const TIMEOUT_MS = 35000;
 
   async function reply(input, messages = []) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
     try {
+      const request = window.ChatPetPrompt
+        ? window.ChatPetPrompt.build(input, messages)
+        : {
+            message: String(input).slice(0, 4000),
+            history: window.ChatPetContext ? window.ChatPetContext.recent(messages) : messages.slice(-24)
+          };
+
       const response = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify({
-          message: String(input).slice(0, 4000),
-          history: messages.slice(-20).map(m => ({
-            role: m.role,
-            content: String(m.content).slice(0, 4000)
-          }))
-        })
+        body: JSON.stringify(request)
       });
 
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data?.error || "Cloud Brain+ HTTP " + response.status);
-      if (!data || typeof data.reply !== "string") throw new Error("Invalid Cloud Brain+ response");
+      if (!response.ok) throw new Error(data?.error || "ChatPet AI HTTP " + response.status);
+      if (!data || typeof data.reply !== "string") throw new Error("Invalid ChatPet AI response");
       return data.reply;
     } catch (error) {
-      if (error?.name === "AbortError") throw new Error("Cloud Brain+ timeout");
+      if (error?.name === "AbortError") throw new Error("ChatPet AI timeout");
       throw error;
     } finally {
       clearTimeout(timer);
