@@ -1,7 +1,7 @@
 const ChatPet = (() => {
-  const KEY = "chatpet:v0.9.1:conversation";
-  const SETTINGS = "chatpet:v0.9.1:settings";
-  const MAX = 20, WINDOW = 60000;
+  const KEY = "chatpet:v0.9.2:conversation";
+  const SETTINGS = "chatpet:v0.9.2:settings";
+  const MAX = 20, WINDOW = 60000, MAX_SAVED_MESSAGES = 50;
   const state = {
     messages: [],
     timestamps: [],
@@ -24,7 +24,7 @@ const ChatPet = (() => {
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
-      if (Array.isArray(saved)) state.messages = saved.slice(-50);
+      if (Array.isArray(saved)) state.messages = saved.filter(m => m && typeof m.content === "string" && ["user","bot","assistant"].includes(m.role)).slice(-MAX_SAVED_MESSAGES);
       const settings = JSON.parse(localStorage.getItem(SETTINGS) || "{}");
       if (["local","cloud","auto"].includes(settings.brain)) state.brain = settings.brain;
       if (settings.theme) state.theme = 1;
@@ -44,7 +44,7 @@ const ChatPet = (() => {
 
   function add(role, content) {
     state.messages.push({ role, content, time: Date.now() });
-    state.messages = state.messages.slice(-50);
+    state.messages = state.messages.slice(-MAX_SAVED_MESSAGES);
     save();
     render();
   }
@@ -53,7 +53,7 @@ const ChatPet = (() => {
     const box = $("#messages");
     if (!box) return;
     if (!state.messages.length) {
-      box.innerHTML = '<div class="message system">🐾 ChatPet v0.9.1 está listo. Escribe /help para ver los comandos.</div>';
+      box.innerHTML = '<div class="message system">🐾 ChatPet v0.9.2 está listo. Escribe /help para ver los comandos.</div>';
     } else {
       box.innerHTML = state.messages.map(m =>
         '<div class="message ' + (m.role === "user" ? "user" : "bot") + '">' + escapeHtml(m.content) + "</div>"
@@ -87,9 +87,10 @@ const ChatPet = (() => {
 
   function command(input) {
     const cmd = input.toLowerCase().trim();
-    if (cmd === "/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about";
+    if (cmd === "/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about · /eastereggs";
+    if (cmd === "/eastereggs") return "🥚 Hay easter eggs escondidos en Local Brain+. Prueba: sus, konami, 42 o hello world.";
     if (cmd === "/status") {
-      return "📊 ChatPet v0.9.1 | Brain " + state.brain.toUpperCase() +
+      return "📊 ChatPet v0.9.2 | Brain " + state.brain.toUpperCase() +
         " | Real AI " + (state.realModelReady ? "READY" : "NOT READY") +
         " | Provider " + state.provider +
         " | Cloud " + (state.cloudOnline ? "ONLINE" : "OFFLINE") +
@@ -121,20 +122,20 @@ const ChatPet = (() => {
       return "📦 Exportación JSON preparada.";
     }
     if (cmd === "/about") {
-      return "🐾 ChatPet v0.9.1 Pre-1.0: contexto, prompt pipeline, provider abstraction y diagnóstico de IA real. El modelo sigue siendo self-hosted y las credenciales permanecen en el servidor.";
+      return "🐾 ChatPet v0.9.2 Pre-1.0: contexto, prompt pipeline, provider abstraction y diagnóstico de IA real. El modelo sigue siendo self-hosted y las credenciales permanecen en el servidor.";
     }
     return null;
   }
 
   function exportData() {
     const blob = new Blob([JSON.stringify({
-      version: "0.9.1",
+      version: "0.9.2",
       exportedAt: new Date().toISOString(),
       messages: state.messages
     }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "chatpet-v0.9.1-memory.json";
+    a.download = "chatpet-v0.9.2-memory.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -199,7 +200,7 @@ const ChatPet = (() => {
 
   function diagnostics() {
     alert(
-      "ChatPet v0.9.1 Pre-1.0\n" +
+      "ChatPet v0.9.2 Pre-1.0\n" +
       "Brain: " + state.brain.toUpperCase() + "\n" +
       "Cloud: " + (state.cloudOnline ? "ONLINE" : "OFFLINE") + "\n" +
       "Real model ready: " + (state.realModelReady ? "YES" : "NO") + "\n" +
