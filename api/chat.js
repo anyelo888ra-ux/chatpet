@@ -2,7 +2,7 @@ function cleanHistory(history) {
   if (!Array.isArray(history)) return [];
   return history
     .filter(item => item && ["user", "assistant", "bot"].includes(item.role) && typeof item.content === "string")
-    .slice(-8)
+    .slice(-20)
     .map(item => ({
       role: item.role === "bot" ? "assistant" : item.role,
       content: item.content.slice(0, 4000)
@@ -16,9 +16,7 @@ function json(res, status, body) {
 function extractReply(data) {
   const content = data?.choices?.[0]?.message?.content;
   if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content.map(part => typeof part === "string" ? part : part?.text || "").join("").trim();
-  }
+  if (Array.isArray(content)) return content.map(part => typeof part === "string" ? part : part?.text || "").join("").trim();
   if (typeof data?.reply === "string") return data.reply;
   if (typeof data?.response === "string") return data.response;
   return "";
@@ -31,7 +29,6 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     return res.status(204).end();
   }
-
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
 
   try {
@@ -44,12 +41,15 @@ export default async function handler(req, res) {
     const apiKey = process.env.MODEL_API_KEY || "";
     const authHeader = process.env.MODEL_AUTH_HEADER || "Authorization";
     const authPrefix = process.env.MODEL_AUTH_PREFIX ?? "Bearer ";
+    const systemPrompt = process.env.MODEL_SYSTEM_PROMPT || "You are ChatPet Cloud Brain+. Be helpful, concise, safe, and honest. Do not claim to be a human. Use the conversation context when relevant.";
+    const temperature = Number.isFinite(Number(process.env.MODEL_TEMPERATURE)) ? Number(process.env.MODEL_TEMPERATURE) : 0.7;
+    const maxTokens = Math.max(64, Math.min(2048, Number(process.env.MODEL_MAX_TOKENS) || 768));
 
     if (!modelUrl) {
       return json(res, 200, {
-        reply: "☁️ Cloud Brain+ está conectado, pero no hay un MODEL_URL configurado. Añade tu endpoint self-hosted en Vercel.",
-        brain: "cloud+",
-        version: "0.7",
+        reply: "☁️ Advanced Cloud está conectado, pero no hay un MODEL_URL configurado. Añade tu endpoint self-hosted en Vercel.",
+        brain: "advanced-cloud",
+        version: "0.8",
         modelConfigured: false
       });
     }
@@ -64,32 +64,29 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: modelName,
         messages: [
-          {
-            role: "system",
-            content: "You are ChatPet Cloud Brain+. Be helpful, concise, safe, and honest. Do not claim to be a human. Use the conversation context when relevant."
-          },
+          { role: "system", content: systemPrompt },
           ...cleanHistory(req.body?.history),
           { role: "user", content: message }
         ],
-        temperature: 0.7,
-        max_tokens: 512
+        temperature,
+        max_tokens: maxTokens
       })
     });
 
     if (!response.ok) throw new Error("Model HTTP " + response.status);
-
     const data = await response.json();
     const reply = extractReply(data);
     if (!reply.trim()) throw new Error("Unsupported model response format");
 
     return json(res, 200, {
       reply: reply.trim(),
-      brain: "cloud+",
-      version: "0.7",
+      brain: "advanced-cloud",
+      version: "0.8",
       model: modelName,
+      contextMessages: cleanHistory(req.body?.history).length,
       latencyMs: Date.now() - started
     });
   } catch {
-    return json(res, 502, { error: "Cloud Brain+ request failed" });
+    return json(res, 502, { error: "Advanced Cloud request failed" });
   }
 }
