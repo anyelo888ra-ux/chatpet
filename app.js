@@ -1,6 +1,6 @@
 const ChatPet = (() => {
-  const KEY = "chatpet:v1.0.0:conversation";
-  const SETTINGS = "chatpet:v1.0.0:settings";
+  const KEY = "chatpet:v1.1.0:conversation";
+  const SETTINGS = "chatpet:v1.1.0:settings";
   const MAX = 20, WINDOW = 60000, MAX_SAVED_MESSAGES = 50;
   const state = {
     messages: [],
@@ -54,7 +54,7 @@ const ChatPet = (() => {
     const box = $("#messages");
     if (!box) return;
     if (!state.messages.length) {
-      box.innerHTML = '<div class="message system">🐾 ChatPet v1.0.0 está listo. Escribe /help para ver los comandos.</div>';
+      box.innerHTML = '<div class="message system">🐾 ChatPet v1.1.0 está listo. Escribe /help para ver los comandos.</div>';
     } else {
       box.innerHTML = state.messages.map(m =>
         '<div class="message ' + (m.role === "user" ? "user" : "bot") + '">' + escapeHtml(m.content) + "</div>"
@@ -91,7 +91,7 @@ const ChatPet = (() => {
     if (cmd === "/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about · /eastereggs · /web URL | pregunta";
     if (cmd === "/eastereggs") return "🥚 Hay easter eggs escondidos en Local Brain+. Prueba: sus, konami, 42 o hello world.";
     if (cmd === "/status") {
-      return "📊 ChatPet v1.0.0 | Brain " + state.brain.toUpperCase() +
+      return "📊 ChatPet v1.1.0 | Brain " + state.brain.toUpperCase() +
         " | Real AI " + (state.realModelReady ? "READY" : "NOT READY") +
         " | Provider " + state.provider +
         " | Cloud " + (state.cloudOnline ? "ONLINE" : "OFFLINE") +
@@ -123,20 +123,20 @@ const ChatPet = (() => {
       return "📦 Exportación JSON preparada.";
     }
     if (cmd === "/about") {
-      return "🐾 ChatPet v1.0.0 v1.0.0: contexto, prompt pipeline, provider abstraction y diagnóstico de IA real. El modelo sigue siendo self-hosted y las credenciales permanecen en el servidor.";
+      return "🐾 ChatPet v1.1.0 v1.1.0: contexto, prompt pipeline, provider abstraction y diagnóstico de IA real. El modelo sigue siendo self-hosted y las credenciales permanecen en el servidor.";
     }
     return null;
   }
 
   function exportData() {
     const blob = new Blob([JSON.stringify({
-      version: "1.0.0",
+      version: "1.1.0",
       exportedAt: new Date().toISOString(),
       messages: state.messages
     }, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "chatpet-v1.0.0-memory.json";
+    a.download = "chatpet-v1.1.0-memory.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -221,7 +221,7 @@ const ChatPet = (() => {
 
   function diagnostics() {
     alert(
-      "ChatPet v1.0.0 Pre-1.0\n" +
+      "ChatPet v1.1.0 Pre-1.0\n" +
       "Brain: " + state.brain.toUpperCase() + "\n" +
       "Cloud: " + (state.cloudOnline ? "ONLINE" : "OFFLINE") + "\n" +
       "Real model ready: " + (state.realModelReady ? "YES" : "NO") + "\n" +
@@ -270,6 +270,14 @@ const ChatPet = (() => {
     });
 
     input.addEventListener("input", () => $("#charCount").textContent = input.value.length + " / 4000");
+    const imageInput = $("#imageInput");
+    if (imageInput) imageInput.addEventListener("change", async e => {
+      const file = e.target.files[0];
+      if (!file || !window.ChatPetVision) return;
+      try { await window.ChatPetVision.set(file); add("bot", "🖼️ Imagen preparada para ChatPet AI: " + file.name); }
+      catch (error) { add("bot", "⚠️ No pude preparar esa imagen: " + error.message); }
+      e.target.value = "";
+    });
     $("#clearBtn").addEventListener("click", () => {
       state.messages = [];
       localStorage.removeItem(KEY);
