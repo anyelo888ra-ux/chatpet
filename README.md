@@ -2,6 +2,10 @@
 
 ChatPet is an open-source experiment to build a transparent, community-driven AI chat platform.
 
+## v0.9.5 — Pre-1.0 Final Candidate
+
+The final maintenance candidate before v1.0.0. This release aligns version metadata across the browser and API layers, hardens the context/prompt pipeline, and keeps the self-hosted real-model architecture ready.
+
 ## v0.9.2 — Stability Patch
 
 The current maintenance line hardens local storage/import handling and adds a small developer easter-egg discovery command while keeping the Pre-1.0 model architecture stable.
@@ -83,12 +87,12 @@ The public hostname is www.chatpet.duckdns.org. DuckDNS provides the hostname; V
 7. ~~v0.7: Multi-Brain~~
 8. ~~v0.8: Advanced Cloud~~
 9. ~~v0.9: Pre-1.0~~
-10. **v0.9.2: Stability Patch** ← current maintenance release
-11. v0.9.5: Pre-1.0 Final Candidate
-12. v1.0: ChatPet AI
+10. ~~v0.9.2: Stability Patch~~
+11. **v0.9.5: Pre-1.0 Final Candidate** ← current
+12. v1.0.0: ChatPet AI
 
 Public domain: www.chatpet.duckdns.org
 
 ## Project Status
 
-ChatPet v0.9 is experimental open-source software. The repository contains the AI integration layer, not the model weights themselves. A real model must be hosted separately and connected through the server environment.
+ChatPet v0.9.5 is experimental open-source software. The repository contains the AI integration layer, not the model weights themselves. A real model must be hosted separately and connected through the server environment.
