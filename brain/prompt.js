@@ -1,5 +1,5 @@
 window.ChatPetPrompt = (() => {
-  const VERSION = "0.9.5";
+  const VERSION = "1.0.0";
   const DEFAULT = "You are ChatPet, an open-source AI assistant. Be helpful, concise, safe, honest, and clear. Use conversation context when relevant. Never claim to be human.";
   function build(input, history = []) {
     return {
