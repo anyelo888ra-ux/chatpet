@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.0 — Vision + Web Context
+
+- Added browser image attachments for vision-capable self-hosted models.
+- Added `brain/vision.js` image preparation layer.
+- Added `/api/browse` for an optional self-hosted web browsing gateway.
+- Added `/web URL | question` command.
+- Added capability reporting for vision and web access.
+- Kept Local Brain+ fallback and server-side credentials.
+
+
 ## v1.0.0 — ChatPet AI
 
 - Promoted the project from Pre-1.0 Final Candidate to the v1.0.0 ChatPet AI release.
