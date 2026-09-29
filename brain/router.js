@@ -9,9 +9,9 @@ window.ChatPetBrainRouter = (() => {
     if(mode==="cloud") return {reply:await cloud(),used:"cloud",cloud:true};
     if(state?.cloudOnline && state?.modelConfigured) {
       try { return {reply:await cloud(),used:"cloud",cloud:true}; }
-      catch { return {reply:"☁️ Cloud Brain+ no respondió. AUTO cambió a Local Brain+.\n\n"+local(),used:"local",cloud:false,fallback:true}; }
+      catch { return {reply:"☁️ Advanced Cloud no respondió. AUTO cambió a Local Brain+.\n\n"+local(),used:"local",cloud:false,fallback:true}; }
     }
-    return {reply:"⚡ AUTO: Cloud Brain+ no está disponible. Usando Local Brain+.\n\n"+local(),used:"local",cloud:false};
+    return {reply:"⚡ AUTO: Advanced Cloud no está disponible. Usando Local Brain+.\n\n"+local(),used:"local",cloud:false};
   }
   return {MODES,next,label,reply};
 })();
