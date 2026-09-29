@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.0 — ChatPet AI
+
+- Promoted the project from Pre-1.0 Final Candidate to the v1.0.0 ChatPet AI release.
+- Unified browser and API release metadata at v1.0.0.
+- Kept LOCAL+, CLOUD+, and AUTO brain modes.
+- Kept self-hosted OpenAI-compatible and Ollama providers.
+- Kept Local Brain+ as the safe local fallback when a real model is unavailable.
+- Increased the cloud adapter timeout to support slower self-hosted models.
+- Kept provider credentials server-side.
+
+
 ## v0.9.5 — Pre-1.0 Final Candidate
 
 - Finalized release version metadata across the app and API.
