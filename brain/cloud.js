@@ -18,7 +18,7 @@ window.ChatPetCloudBrain = (() => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify(request)
+        body: JSON.stringify(window.ChatPetVision?.attach(request) || request)
       });
 
       const data = await response.json().catch(() => ({}));
