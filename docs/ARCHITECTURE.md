@@ -1,5 +1,9 @@
 # ChatPet Architecture
 
+## v0.9.5 Final Candidate
+
+The v0.9.5 release candidate keeps the v0.9 architecture stable while aligning the browser, context, prompt, router, and API layers for the v1.0.0 transition.
+
 ## v0.9 — Pre-1.0
 
 Browser -> app.js -> Brain Router -> Local Brain+ / Real AI / AUTO
