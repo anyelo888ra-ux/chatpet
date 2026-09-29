@@ -2,6 +2,20 @@
 
 ChatPet is an open-source experiment to build a transparent, community-driven AI chat platform.
 
+## v1.1.0 — Vision + Web Context
+
+ChatPet can now accept image attachments for vision-capable self-hosted models and can use a self-hosted web browsing gateway through `/api/browse`.
+
+- 🖼️ Image input up to 4 MB in the browser.
+- 🌐 `/web URL | question` sends a page request to the configured `WEB_TOOL_URL` gateway.
+- 🔐 Web access is opt-in and remains behind a self-hosted gateway; ChatPet does not ship a commercial search API key.
+- 🧠 Vision requires a model/backend that supports images.
+- 🐾 Local Brain+ remains the fallback.
+
+### Web access
+
+Set `WEB_TOOL_URL` in Vercel to a self-hosted browsing gateway that accepts `{ url, question }` and returns `{ answer }`. ChatPet validates the URL as HTTP(S), limits input size, and applies a timeout. The gateway is responsible for fetching pages and any additional security controls.
+
 ## v1.0.0 — ChatPet AI
 
 The first stable ChatPet AI release. The repository now treats the model adapter, brain router, context pipeline, diagnostics, and Local Brain+ fallback as the production chat core.
@@ -91,10 +105,11 @@ The public hostname is www.chatpet.duckdns.org. DuckDNS provides the hostname; V
 9. ~~v0.9: Pre-1.0~~
 10. ~~v0.9.2: Stability Patch~~
 11. ~~v0.9.5: Pre-1.0 Final Candidate~~
-12. **v1.0.0: ChatPet AI** ← current
+12. ~~v1.0.0: ChatPet AI~~
+13. **v1.1.0: Vision + Web Context** ← current
 
 Public domain: www.chatpet.duckdns.org
 
 ## Project Status
 
-ChatPet v1.0.0 is experimental open-source software. The repository contains the AI integration layer, not the model weights themselves. A real model must be hosted separately and connected through the server environment.
+ChatPet v1.1.0 is experimental open-source software. The repository contains the AI integration layer, not the model weights themselves. A real model must be hosted separately and connected through the server environment.
