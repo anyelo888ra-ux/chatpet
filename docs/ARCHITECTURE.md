@@ -1,5 +1,9 @@
 # ChatPet Architecture
 
+## v1.0.0 — ChatPet AI
+
+v1.0.0 is the stable application architecture. A real model remains an external dependency and must be configured through Vercel environment variables.
+
 ## v0.9.5 Final Candidate
 
 The v0.9.5 release candidate keeps the v0.9 architecture stable while aligning the browser, context, prompt, router, and API layers for the v1.0.0 transition.
@@ -85,7 +89,7 @@ Browser -> www.chatpet.duckdns.org -> Vercel -> /api/chat -> model endpoint
 
 DuckDNS is only the public hostname layer.
 
-## Future v1.0
+## Future versions
 
 Browser -> Brain Router -> production model backend -> response pipeline -> ChatPet UI
 
