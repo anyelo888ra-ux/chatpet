@@ -28,7 +28,7 @@ function providerName() {
   return provider === "ollama" ? "ollama" : "openai-compatible";
 }
 
-async function requestModel({ modelUrl, modelName, messages, temperature, maxTokens, apiKey, authHeader, authPrefix, systemPrompt }) {
+async function requestModel({ modelUrl, modelName, messages, temperature, maxTokens, apiKey, authHeader, authPrefix, systemPrompt, image }) {
   const provider = providerName();
   const controller = new AbortController();
   const timeoutMs = Math.max(5000, Math.min(60000, Number(process.env.MODEL_TIMEOUT_MS) || 30000));
@@ -38,16 +38,18 @@ async function requestModel({ modelUrl, modelName, messages, temperature, maxTok
     const headers = { "Content-Type": "application/json" };
     if (apiKey && provider !== "ollama") headers[authHeader] = authPrefix + apiKey;
 
+    const userMessages = image ? messages.map((item, index) => index === messages.length - 1 && item.role === "user" ? { ...item, content: [{ type: "text", text: item.content }, { type: "image_url", image_url: { url: image } }] } : item) : messages;
+
     const payload = provider === "ollama"
       ? {
           model: modelName,
-          messages,
+          messages: image ? messages.map((item, index) => index === messages.length - 1 && item.role === "user" ? { ...item, images: [image.split(",")[1] || image] } : item) : messages,
           stream: false,
           options: { temperature, num_predict: maxTokens }
         }
       : {
           model: modelName,
-          messages,
+          messages: userMessages,
           temperature,
           max_tokens: maxTokens
         };
