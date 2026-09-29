@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9.2 — Stability Patch
+
+- Hardened local conversation loading against malformed stored data.
+- Hardened JSON import validation and normalizes imported roles.
+- Added `/eastereggs` developer command.
+- Updated release metadata and cache-busting to v0.9.2.
+- Kept the Pre-1.0 real-model architecture unchanged.
+
+
+
 ## v0.9.1 — Maintenance + Easter Eggs
 
 - Fixed the Local Brain response text still reporting v0.4.
