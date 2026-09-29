@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     const temperature = Number.isFinite(temperatureRaw) ? Math.max(0, Math.min(2, temperatureRaw)) : 0.7;
     const maxTokens = Math.max(64, Math.min(4096, Number(process.env.MODEL_MAX_TOKENS) || 1024));
     const history = normalizeMessages(req.body?.history);
+    const image = typeof req.body?.image === "string" && req.body.image.startsWith("data:image/") && req.body.image.length <= 5500000 ? req.body.image : null;
 
     if (!modelUrl) {
       return json(res, 200, {
@@ -35,7 +36,8 @@ export default async function handler(req, res) {
         brain: "chatpet-ai",
         version: "1.0.0",
         modelConfigured: false,
-        provider: providerName()
+        provider: providerName(),
+        visionConfigured: false
       });
     }
 
@@ -53,7 +55,8 @@ export default async function handler(req, res) {
       apiKey,
       authHeader,
       authPrefix,
-      systemPrompt
+      systemPrompt,
+      image
     });
 
     return json(res, 200, {
@@ -63,6 +66,7 @@ export default async function handler(req, res) {
       model: result.model,
       provider: result.provider,
       contextMessages: history.length,
+      visionUsed: Boolean(image),
       latencyMs: Date.now() - started
     });
   } catch (error) {
