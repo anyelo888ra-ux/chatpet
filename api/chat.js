@@ -31,9 +31,9 @@ export default async function handler(req, res) {
 
     if (!modelUrl) {
       return json(res, 200, {
-        reply: "☁️ ChatPet v0.9 está listo, pero no hay un MODEL_URL configurado. Conecta un modelo self-hosted para activar la IA real.",
-        brain: "pre-1.0-final-candidate",
-        version: "0.9.5",
+        reply: "☁️ ChatPet AI v1.0.0 está listo, pero no hay un MODEL_URL configurado. Conecta un modelo self-hosted para activar la IA real.",
+        brain: "chatpet-ai",
+        version: "1.0.0",
         modelConfigured: false,
         provider: providerName()
       });
@@ -58,8 +58,8 @@ export default async function handler(req, res) {
 
     return json(res, 200, {
       reply: result.reply,
-      brain: "pre-1.0-final-candidate",
-      version: "0.9.5",
+      brain: "chatpet-ai",
+      version: "1.0.0",
       model: result.model,
       provider: result.provider,
       contextMessages: history.length,
