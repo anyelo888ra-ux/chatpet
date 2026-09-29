@@ -13,7 +13,8 @@ const ChatPet = (() => {
     realModelReady: false,
     provider: "openai-compatible",
     lastUsedBrain: "local",
-    cloudContext: 24
+    cloudContext: 24,
+    imageReady: false
   };
   const $ = selector => document.querySelector(selector);
 
@@ -87,7 +88,7 @@ const ChatPet = (() => {
 
   function command(input) {
     const cmd = input.toLowerCase().trim();
-    if (cmd === "/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about · /eastereggs";
+    if (cmd === "/help") return "🛠️ Comandos: /help · /status · /memory · /clear · /export · /brain · /about · /eastereggs · /web URL | pregunta";
     if (cmd === "/eastereggs") return "🥚 Hay easter eggs escondidos en Local Brain+. Prueba: sus, konami, 42 o hello world.";
     if (cmd === "/status") {
       return "📊 ChatPet v1.0.0 | Brain " + state.brain.toUpperCase() +
@@ -159,9 +160,29 @@ const ChatPet = (() => {
     reader.readAsText(file);
   }
 
+  async function browseCommand(clean) {
+    const match = clean.match(/^\/web\\s+(https?:\\/\\/\\S+)\\s*\\|\\s*(.+)$/i);
+    if (!match) return null;
+    try {
+      const response = await fetch("/api/browse", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: match[1], question: match[2] }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Web request failed");
+      return "🌐 Web context (" + match[1] + ")\\n\\n" + (data.answer || "No answer returned.");
+    } catch (error) {
+      return "🌐 Web access unavailable: " + (error.message || "unknown error");
+    }
+  }
+
   async function send(input) {
     const clean = input.trim();
     if (!clean) return;
+
+    if (/^\\/web\\s+/i.test(clean)) {
+      add("user", clean);
+      $("#typing").hidden = false;
+      try { add("bot", await browseCommand(clean)); } finally { $("#typing").hidden = true; render(); }
+      return;
+    }
 
     const result = command(clean);
     if (result !== null) {
